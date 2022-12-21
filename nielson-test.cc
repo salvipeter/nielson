@@ -47,13 +47,13 @@ main(int argc, char **argv) {
   if (argc < 3 || argc > 5) {
     std::cerr << "Usage: " << argv[0]
               << " <input.obj> <output.stl> [fullness] [resolution]" << std::endl;
-    std::cerr << "Defaults to fullness = 1 (should be positive) and resolution = 15." << std::endl;
+    std::cerr << "Defaults to fullness = 1 (should be positive) and resolution = 30." << std::endl;
     return 1;
   }
   double fullness = 1.0;
   if (argc >= 4)
     fullness = std::strtod(argv[3], nullptr);
-  size_t resolution = 15;
+  size_t resolution = 30;
   if (argc == 5)
     resolution = std::atoi(argv[4]);
   auto mesh = TriMesh::readOBJ(argv[1]);

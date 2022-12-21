@@ -22,9 +22,12 @@ static Point3D
 hermiteCurve(const Point3D &p0, const Point3D &p1,
              const Vector3D &n0, const Vector3D &n1,
              double fullness, double t) {
+  // This is not written in the paper, but the tangents obviously
+  // need to be scaled, e.g. by the distance of the endpoints.
+  double d = (p1 - p0).norm();
   return p0 * hermite(0, t) + p1 * hermite(1, t) +
-    ((n0 ^ (p1 - p0)) ^ n0).normalize() * hermite(2, t) * fullness +
-    ((n1 ^ (p1 - p0)) ^ n1).normalize() * hermite(3, t) * fullness;
+    ((n0 ^ (p1 - p0)) ^ n0).normalize() * d * hermite(2, t) * fullness +
+    ((n1 ^ (p1 - p0)) ^ n1).normalize() * d * hermite(3, t) * fullness;
 }
 
 static Point3D
@@ -43,6 +46,7 @@ transfinite(const std::array<Nielson::Boundary, 3> &boundaries,
     if (b[i] > epsilon)
       nonzero = i;
     double blend = b[j] * b[j] * b[k] * b[k];
+    // double blend = b[j] * b[k]; // this can be used when ribbons interpolate all sides
     result += p * blend;
     bsum += blend;
   }
