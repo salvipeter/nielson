@@ -1,4 +1,5 @@
 #include <fstream>
+#include <sstream>
 
 #include "nielson.hh"
 
@@ -42,6 +43,28 @@ approximateNormals(const TriMesh &mesh) {
   return normals;
 }
 
+// Assumes that normal vectors have the same indices
+// as the corresponding vertices.
+VectorVector extractNormals(std::string filename) {
+  VectorVector normals;
+  std::ifstream f(filename);
+  f.exceptions(std::ios::failbit | std::ios::badbit);
+  std::string line;
+  std::istringstream ss;
+  Vector3D n;
+  while (!f.eof()) {
+    std::getline(f, line);
+    f >> std::ws;
+    if (line.empty() || line[0] != 'v' || line[1] != 'n')
+      continue;
+    ss.str(line);
+    ss.seekg(3); // skip the first three characters
+    ss >> n[0] >> n[1] >> n[2];
+    normals.push_back(n);
+  }
+  return normals;
+}
+
 int
 main(int argc, char **argv) {
   if (argc < 3 || argc > 5) {
@@ -57,7 +80,9 @@ main(int argc, char **argv) {
   if (argc == 5)
     resolution = std::atoi(argv[4]);
   auto mesh = TriMesh::readOBJ(argv[1]);
-  auto normals = approximateNormals(mesh);
+  auto normals = extractNormals(argv[1]);
+  if (normals.empty())
+    normals = approximateNormals(mesh);
   // writeNormals(mesh.points(), normals, "/tmp/normals.vtk");
   Nielson::evaluate(mesh, normals, fullness, resolution).writeSTL(argv[2]);
 }
