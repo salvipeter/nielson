@@ -81,7 +81,7 @@ main(int argc, char **argv) {
     resolution = std::atoi(argv[4]);
   auto mesh = TriMesh::readOBJ(argv[1]);
   auto normals = extractNormals(argv[1]);
-  if (normals.empty())
+  if (normals.size() != mesh.points().size())
     normals = approximateNormals(mesh);
   // writeNormals(mesh.points(), normals, "/tmp/normals.vtk");
   Nielson::evaluate(mesh, normals, fullness, resolution).writeSTL(argv[2]);
